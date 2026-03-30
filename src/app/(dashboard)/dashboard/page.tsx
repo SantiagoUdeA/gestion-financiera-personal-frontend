@@ -20,7 +20,7 @@ export default function DashboardPage() {
   const { transactions, loading, totals, balance, byCategory } = useTransactions();
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-white">
           Hola, {user?.primer_nombre} 👋
@@ -67,19 +67,19 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-slate-800/30 rounded-xl border border-slate-700/50 p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6">
+        <div className="lg:col-span-2 bg-slate-800/30 rounded-xl border border-slate-700/50 p-4 sm:p-6">
           <h2 className="text-white font-semibold mb-4">Transacciones recientes</h2>
           <RecentTransactions transactions={transactions} />
         </div>
 
-        <div className="space-y-6">
-          <div className="bg-slate-800/30 rounded-xl border border-slate-700/50 p-6">
+        <div className="space-y-5 lg:space-y-6">
+          <div className="bg-slate-800/30 rounded-xl border border-slate-700/50 p-4 sm:p-6">
             <h2 className="text-white font-semibold mb-4">Gastos por categoría</h2>
             <SpendingByCategory data={byCategory} />
           </div>
 
-          <div className="bg-slate-800/30 rounded-xl border border-slate-700/50 p-6">
+          <div className="bg-slate-800/30 rounded-xl border border-slate-700/50 p-4 sm:p-6">
             <FinancialHealthCard
               ingresos={totals.ingresos}
               gastos={totals.gastos}

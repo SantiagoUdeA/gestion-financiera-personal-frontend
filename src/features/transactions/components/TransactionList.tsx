@@ -47,7 +47,7 @@ export function TransactionList({ transactions, loading }: TransactionListProps)
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-3 items-center">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
           <Input
@@ -57,12 +57,12 @@ export function TransactionList({ transactions, loading }: TransactionListProps)
             className="pl-9 bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500"
           />
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1 shrink-0">
           {(['TODOS', 'INGRESO', 'GASTO'] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 filter === f
                   ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                   : 'text-slate-400 hover:text-white bg-slate-800 border border-slate-700'
@@ -113,7 +113,7 @@ export function TransactionList({ transactions, loading }: TransactionListProps)
                 <p className="text-slate-500 text-xs">{formatDate(tx.fecha)}</p>
               </div>
               <span
-                className={`text-base font-bold ${
+                className={`text-sm sm:text-base font-bold shrink-0 ${
                   tx.tipo === 'INGRESO' ? 'text-emerald-400' : 'text-red-400'
                 }`}
               >
