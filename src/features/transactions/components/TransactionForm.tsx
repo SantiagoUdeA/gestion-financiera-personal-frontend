@@ -102,7 +102,6 @@ export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
           id="monto"
           type="number"
           min="1"
-          step="100"
           value={form.monto || ""}
           onChange={(e) => update("monto", parseFloat(e.target.value) || 0)}
           className="bg-slate-700/50 border-slate-600 text-white focus:border-emerald-500"
@@ -129,7 +128,9 @@ export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
         <Label className="text-slate-300 text-sm">Categoría</Label>
         <div className="relative">
           {(() => {
-            const selected = filteredCategories.find((c) => c.id === form.categoriaId);
+            const selected = filteredCategories.find(
+              (c) => c.id === form.categoriaId,
+            );
             const Icon = selected?.icono;
             return (
               <button
@@ -158,7 +159,9 @@ export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
                         setCategoryOpen(false);
                       }}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-slate-700 transition-colors ${
-                        form.categoriaId === cat.id ? "text-emerald-400" : "text-white"
+                        form.categoriaId === cat.id
+                          ? "text-emerald-400"
+                          : "text-white"
                       }`}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
