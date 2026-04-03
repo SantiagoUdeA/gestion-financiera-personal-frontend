@@ -8,6 +8,7 @@ import {
   TrendingUp,
   LayoutDashboard,
   ArrowLeftRight,
+  Tag,
   LogOut,
   ChevronRight,
   X,
@@ -17,6 +18,7 @@ import { cn } from '@/lib/utils';
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/transactions', label: 'Transacciones', icon: ArrowLeftRight },
+  { href: '/categories', label: 'Categorías', icon: Tag },
 ];
 
 interface SidebarProps {
