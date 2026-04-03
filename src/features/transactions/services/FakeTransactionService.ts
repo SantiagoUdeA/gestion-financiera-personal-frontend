@@ -1,6 +1,6 @@
 import { TransactionRequest, TransactionResponse } from '@/types/transaction';
 import { ITransactionService } from './ITransactionService';
-import { CATEGORIES } from '@/types/category';
+import { FakeCategoryService } from '@/features/categories/services/FakeCategoryService';
 
 let FAKE_TRANSACTIONS: TransactionResponse[] = [
   { id: 1, tipo: 'INGRESO', monto: 3500000, fecha: '2026-03-01', categoria: 'Salario' },
@@ -18,6 +18,7 @@ let FAKE_TRANSACTIONS: TransactionResponse[] = [
 ];
 
 let nextId = 13;
+const fakeCategoryService = new FakeCategoryService();
 
 export class FakeTransactionService implements ITransactionService {
   async listar(): Promise<TransactionResponse[]> {
@@ -29,7 +30,8 @@ export class FakeTransactionService implements ITransactionService {
 
   async crear(request: TransactionRequest): Promise<TransactionResponse> {
     await new Promise((r) => setTimeout(r, 400));
-    const cat = CATEGORIES.find((c) => c.id === request.categoriaId);
+    const cats = await fakeCategoryService.listar();
+    const cat = cats.find((c) => c.id === request.categoriaId);
     const newTx: TransactionResponse = {
       id: nextId++,
       tipo: request.tipo,

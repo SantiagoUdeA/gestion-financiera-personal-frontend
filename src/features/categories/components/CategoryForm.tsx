@@ -29,7 +29,7 @@ export function CategoryForm({ onSubmit, saving, editTarget, onCancel }: Categor
     setSuccess(false);
   }, [editTarget]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);

@@ -1,37 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CATEGORIES } from "@/types/category";
+import { fetchCategoriesAction } from "@/features/categories/actions/category-actions";
+import { CategoryResponse } from "@/types/category-api";
 import { TransactionRequest } from "@/types/transaction";
 import { AlertCircle, CheckCircle2, ChevronDown } from "lucide-react";
 
 interface TransactionFormProps {
-  onSubmit: (data: TransactionRequest) => Promise<void>;
-  creating: boolean;
+  readonly onSubmit: (data: TransactionRequest) => Promise<void>;
+  readonly creating: boolean;
+}
+
+function tipoBtnClass(selected: boolean, tipo: "INGRESO" | "GASTO"): string {
+  if (!selected) return "bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600";
+  return tipo === "INGRESO"
+    ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400"
+    : "bg-red-500/20 border-red-500/50 text-red-400";
 }
 
 export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
+  const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [form, setForm] = useState<TransactionRequest>({
     tipo: "GASTO",
     monto: 0,
     fecha: new Date().toISOString().split("T")[0],
-    categoriaId: 5,
+    categoriaId: 0,
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const update = (field: string, value: string | number) =>
-    setForm({ ...form, [field]: value });
+  useEffect(() => {
+    fetchCategoriesAction().then((cats) => {
+      setCategories(cats);
+      const firstGasto = cats.find((c) => c.tipo === "GASTO");
+      if (firstGasto) setForm((f) => ({ ...f, categoriaId: firstGasto.id }));
+    });
+  }, []);
 
-  const filteredCategories = CATEGORIES.filter(
-    (c) => c.tipo === form.tipo || c.tipo === "AMBOS",
-  );
+  const filteredCategories = categories.filter((c) => c.tipo === form.tipo);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleTipoChange = (tipo: "INGRESO" | "GASTO") => {
+    const first = categories.find((c) => c.tipo === tipo);
+    setForm({ ...form, tipo, categoriaId: first?.id ?? 0 });
+  };
+
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
@@ -42,17 +59,20 @@ export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
     try {
       await onSubmit(form);
       setSuccess(true);
+      const first = categories.find((c) => c.tipo === "GASTO");
       setForm({
         tipo: "GASTO",
         monto: 0,
         fecha: new Date().toISOString().split("T")[0],
-        categoriaId: 5,
+        categoriaId: first?.id ?? 0,
       });
       setTimeout(() => setSuccess(false), 3000);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Error al crear transacción");
     }
   };
+
+  const selectedCategory = filteredCategories.find((c) => c.id === form.categoriaId);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,17 +96,8 @@ export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
             <button
               key={tipo}
               type="button"
-              onClick={() => {
-                const defaultCat = tipo === "INGRESO" ? 1 : 5;
-                setForm({ ...form, tipo, categoriaId: defaultCat });
-              }}
-              className={`py-2.5 rounded-lg text-sm font-medium border transition-all ${
-                form.tipo === tipo
-                  ? tipo === "INGRESO"
-                    ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400"
-                    : "bg-red-500/20 border-red-500/50 text-red-400"
-                  : "bg-slate-800 border-slate-700 text-slate-400 hover:border-slate-600"
-              }`}
+              onClick={() => handleTipoChange(tipo)}
+              className={`py-2.5 rounded-lg text-sm font-medium border transition-all ${tipoBtnClass(form.tipo === tipo, tipo)}`}
             >
               {tipo === "INGRESO" ? "↑ Ingreso" : "↓ Gasto"}
             </button>
@@ -103,7 +114,7 @@ export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
           type="number"
           min="1"
           value={form.monto || ""}
-          onChange={(e) => update("monto", parseFloat(e.target.value) || 0)}
+          onChange={(e) => setForm({ ...form, monto: Number.parseFloat(e.target.value) || 0 })}
           className="bg-slate-700/50 border-slate-600 text-white focus:border-emerald-500"
           placeholder="0"
           required
@@ -118,7 +129,7 @@ export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
           id="fecha"
           type="date"
           value={form.fecha}
-          onChange={(e) => update("fecha", e.target.value)}
+          onChange={(e) => setForm({ ...form, fecha: e.target.value })}
           className="bg-slate-700/50 border-slate-600 text-white focus:border-emerald-500"
           required
         />
@@ -127,49 +138,32 @@ export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
       <div className="space-y-1.5">
         <Label className="text-slate-300 text-sm">Categoría</Label>
         <div className="relative">
-          {(() => {
-            const selected = filteredCategories.find(
-              (c) => c.id === form.categoriaId,
-            );
-            const Icon = selected?.icono;
-            return (
-              <button
-                type="button"
-                onClick={() => setCategoryOpen((o) => !o)}
-                className="w-full h-9 px-3 flex items-center justify-between rounded-md bg-slate-700/50 border border-slate-600 text-white text-sm focus:outline-none focus:border-emerald-500"
-              >
-                <span className="flex items-center gap-2">
-                  {Icon && <Icon className="h-4 w-4 text-slate-400" />}
-                  {selected?.nombre ?? "Seleccionar"}
-                </span>
-                <ChevronDown className="h-4 w-4 text-slate-400" />
-              </button>
-            );
-          })()}
+          <button
+            type="button"
+            onClick={() => setCategoryOpen((o) => !o)}
+            className="w-full h-9 px-3 flex items-center justify-between rounded-md bg-slate-700/50 border border-slate-600 text-white text-sm focus:outline-none focus:border-emerald-500"
+          >
+            <span>{selectedCategory?.nombre ?? "Seleccionar"}</span>
+            <ChevronDown className="h-4 w-4 text-slate-400" />
+          </button>
           {categoryOpen && (
             <ul className="absolute z-10 mt-1 w-full rounded-md bg-slate-800 border border-slate-700 shadow-lg max-h-48 overflow-y-auto">
-              {filteredCategories.map((cat) => {
-                const Icon = cat.icono;
-                return (
-                  <li key={cat.id}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        update("categoriaId", cat.id);
-                        setCategoryOpen(false);
-                      }}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-slate-700 transition-colors ${
-                        form.categoriaId === cat.id
-                          ? "text-emerald-400"
-                          : "text-white"
-                      }`}
-                    >
-                      <Icon className="h-4 w-4 shrink-0" />
-                      {cat.nombre}
-                    </button>
-                  </li>
-                );
-              })}
+              {filteredCategories.map((cat) => (
+                <li key={cat.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm({ ...form, categoriaId: cat.id });
+                      setCategoryOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-slate-700 transition-colors ${
+                      form.categoriaId === cat.id ? "text-emerald-400" : "text-white"
+                    }`}
+                  >
+                    {cat.nombre}
+                  </button>
+                </li>
+              ))}
             </ul>
           )}
         </div>
