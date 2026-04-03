@@ -5,18 +5,32 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useLogin } from '../hooks/useLogin';
+import { loginAction } from '../actions/login-actions';
+import { setAuthData } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, TrendingUp, AlertCircle } from 'lucide-react';
 
 export function LoginForm() {
-  const { handleLogin, loading, error } = useLogin();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: 'demo@finanzas.com', contrasena: 'Demo@1234' });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    handleLogin(form);
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await loginAction(form);
+      setAuthData(data);
+      router.push('/dashboard');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error al iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuthContext } from '@/context/AuthContext';
+import { useAuthUser, clearAuthData } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import {
   TrendingUp,
@@ -26,11 +26,11 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const { user, logout } = useAuthContext();
+  const user = useAuthUser();
   const router = useRouter();
 
   const handleLogout = () => {
-    logout();
+    clearAuthData();
     router.push('/login');
   };
 

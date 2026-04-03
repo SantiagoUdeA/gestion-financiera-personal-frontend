@@ -1,14 +1,14 @@
 'use client';
 
 import { Menu, TrendingUp } from 'lucide-react';
-import { useAuthContext } from '@/context/AuthContext';
+import { useAuthUser } from '@/lib/auth';
 
 interface MobileHeaderProps {
   readonly onMenuOpen: () => void;
 }
 
 export function MobileHeader({ onMenuOpen }: MobileHeaderProps) {
-  const { user } = useAuthContext();
+  const user = useAuthUser();
 
   return (
     <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between px-4 h-14 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800">

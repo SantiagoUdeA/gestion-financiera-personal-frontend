@@ -1,7 +1,9 @@
 "use client";
 
-import { useAuthContext } from "@/context/AuthContext";
-import { useTransactions } from "@/features/transactions/hooks/useTransactions";
+import { useEffect, useState } from "react";
+import { useAuthUser } from "@/lib/auth";
+import { fetchTransactionsAction } from "@/features/transactions/actions/transaction-actions";
+import { TransactionResponse } from "@/types/transaction";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { SpendingByCategory } from "@/components/dashboard/SpendingByCategory";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
@@ -16,9 +18,31 @@ const formatCurrency = (amount: number) =>
   }).format(amount);
 
 export default function DashboardPage() {
-  const { user } = useAuthContext();
-  const { transactions, loading, totals, balance, byCategory } =
-    useTransactions();
+  const user = useAuthUser();
+  const [transactions, setTransactions] = useState<TransactionResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTransactionsAction()
+      .then(setTransactions)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const totals = transactions.reduce(
+    (acc, t) => {
+      if (t.tipo === "INGRESO") acc.ingresos += Number(t.monto);
+      else acc.gastos += Number(t.monto);
+      return acc;
+    },
+    { ingresos: 0, gastos: 0 },
+  );
+  const balance = totals.ingresos - totals.gastos;
+  const byCategory = transactions.reduce<Record<string, number>>((acc, t) => {
+    if (t.tipo === "GASTO") {
+      acc[t.categoria] = (acc[t.categoria] ?? 0) + Number(t.monto);
+    }
+    return acc;
+  }, {});
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8">

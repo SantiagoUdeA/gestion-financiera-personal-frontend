@@ -5,12 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useRegister } from '../hooks/useRegister';
+import { registerAction } from '../actions/login-actions';
+import { setAuthData } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { TrendingUp, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export function RegisterForm() {
-  const { handleRegister, loading, error } = useRegister();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     primer_nombre: '',
@@ -19,9 +23,19 @@ export function RegisterForm() {
     contrasena: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    handleRegister(form);
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await registerAction(form);
+      setAuthData(data);
+      router.push('/dashboard');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error al registrarse');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const update = (field: string, value: string) => setForm({ ...form, [field]: value });

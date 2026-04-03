@@ -1,14 +1,43 @@
 'use client';
 
-import { useTransactions } from '@/features/transactions/hooks/useTransactions';
+import { useEffect, useState } from 'react';
+import { fetchTransactionsAction, createTransactionAction } from '@/features/transactions/actions/transaction-actions';
 import { TransactionList } from '@/features/transactions/components/TransactionList';
 import { TransactionForm } from '@/features/transactions/components/TransactionForm';
+import { TransactionRequest, TransactionResponse } from '@/types/transaction';
 import { Plus } from 'lucide-react';
-import { useState } from 'react';
 
 export default function TransactionsPage() {
-  const { transactions, loading, creating, createTransaction, totals, balance } = useTransactions();
+  const [transactions, setTransactions] = useState<TransactionResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
   const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    fetchTransactionsAction()
+      .then(setTransactions)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleCreate = async (data: TransactionRequest) => {
+    setCreating(true);
+    try {
+      const created = await createTransactionAction(data);
+      setTransactions((prev) => [created, ...prev]);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const totals = transactions.reduce(
+    (acc, t) => {
+      if (t.tipo === 'INGRESO') acc.ingresos += Number(t.monto);
+      else acc.gastos += Number(t.monto);
+      return acc;
+    },
+    { ingresos: 0, gastos: 0 },
+  );
+  const balance = totals.ingresos - totals.gastos;
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat('es-CO', {
@@ -51,7 +80,7 @@ export default function TransactionsPage() {
         {showForm && (
           <div className="bg-slate-800/30 rounded-xl border border-slate-700/50 p-4 sm:p-6">
             <h2 className="text-white font-semibold mb-4">Nueva transacción</h2>
-            <TransactionForm onSubmit={(data) => createTransaction(data).then(() => void 0)} creating={creating} />
+            <TransactionForm onSubmit={handleCreate} creating={creating} />
           </div>
         )}
         <div className={showForm ? 'lg:col-span-2' : 'lg:col-span-3'}>
