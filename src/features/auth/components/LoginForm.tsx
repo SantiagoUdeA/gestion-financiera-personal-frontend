@@ -25,9 +25,28 @@ export function LoginForm() {
     email: "",
     contrasena: "",
   });
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) return "Mínimo 8 caracteres";
+    if (!/[A-Z]/.test(password)) return "Debe contener al menos una mayúscula";
+    if (!/[0-9]/.test(password)) return "Debe contener al menos un número";
+    if (!/[^A-Za-z0-9]/.test(password)) return "Debe contener al menos un carácter especial";
+    return null;
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setForm({ ...form, contrasena: value });
+    setPasswordError(validatePassword(value));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const validationError = validatePassword(form.contrasena);
+    if (validationError) {
+      setPasswordError(validationError);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -92,10 +111,8 @@ export function LoginForm() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     value={form.contrasena}
-                    onChange={(e) =>
-                      setForm({ ...form, contrasena: e.target.value })
-                    }
-                    className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500 pr-10"
+                    onChange={(e) => handlePasswordChange(e.target.value)}
+                    className={`bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500 pr-10 ${passwordError ? "border-red-500" : ""}`}
                     required
                   />
                   <button
@@ -110,6 +127,9 @@ export function LoginForm() {
                     )}
                   </button>
                 </div>
+                {passwordError && (
+                  <p className="text-red-400 text-xs mt-1">{passwordError}</p>
+                )}
               </div>
               <Button
                 type="submit"
