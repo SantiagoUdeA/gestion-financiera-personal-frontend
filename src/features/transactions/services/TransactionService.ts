@@ -1,16 +1,18 @@
+import { cookies } from 'next/headers';
 import { TransactionRequest, TransactionResponse } from '@/types/transaction';
 import { ITransactionService } from './ITransactionService';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
 export class TransactionService implements ITransactionService {
-  private getToken() {
-    return typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+  private async getToken() {
+    const cookieStore = await cookies();
+    return cookieStore.get('token')?.value ?? '';
   }
 
   async listar(): Promise<TransactionResponse[]> {
     const res = await fetch(`${BASE_URL}/api/v1/transacciones`, {
-      headers: { Authorization: `Bearer ${this.getToken()}` },
+      headers: { Authorization: `Bearer ${await this.getToken()}` },
     });
     if (!res.ok) throw new Error('Error al cargar transacciones');
     return res.json();
@@ -21,7 +23,7 @@ export class TransactionService implements ITransactionService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.getToken()}`,
+        Authorization: `Bearer ${await this.getToken()}`,
       },
       body: JSON.stringify(request),
     });

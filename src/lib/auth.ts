@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react';
 import { AuthResponse } from '@/types/auth';
 
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 export function getAuthData(): AuthResponse | null {
   if (typeof window === 'undefined') return null;
-  const stored = localStorage.getItem('auth');
+  const stored = getCookie('auth');
   return stored ? (JSON.parse(stored) as AuthResponse) : null;
 }
 
-export function setAuthData(data: AuthResponse): void {
-  localStorage.setItem('auth', JSON.stringify(data));
-  document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
-}
-
 export function clearAuthData(): void {
-  localStorage.removeItem('auth');
   document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  document.cookie = 'auth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 }
 
 export function useAuthUser() {

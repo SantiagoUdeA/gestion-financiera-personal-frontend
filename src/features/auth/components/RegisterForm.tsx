@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { registerAction } from '../actions/login-actions';
-import { setAuthData } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { TrendingUp, AlertCircle, Eye, EyeOff } from 'lucide-react';
@@ -28,8 +27,7 @@ export function RegisterForm() {
     setLoading(true);
     setError(null);
     try {
-      const data = await registerAction(form);
-      setAuthData(data);
+      await registerAction(form);
       router.push('/dashboard');
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Error al registrarse');

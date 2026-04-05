@@ -1,3 +1,5 @@
+'use server';
+
 import { TransactionRequest } from '@/types/transaction';
 import { transactionService } from '../services';
 

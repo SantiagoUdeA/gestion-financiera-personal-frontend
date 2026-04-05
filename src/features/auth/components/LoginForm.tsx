@@ -1,33 +1,40 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { loginAction } from '../actions/login-actions';
-import { setAuthData } from '@/lib/auth';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Eye, EyeOff, TrendingUp, AlertCircle } from 'lucide-react';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { loginAction } from "../actions/login-actions";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Eye, EyeOff, TrendingUp, AlertCircle } from "lucide-react";
 
 export function LoginForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [form, setForm] = useState({ email: 'demo@finanzas.com', contrasena: 'Demo@1234' });
+  const [form, setForm] = useState({
+    email: "",
+    contrasena: "",
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
-      const data = await loginAction(form);
-      setAuthData(data);
-      router.push('/dashboard');
+      await loginAction(form);
+      router.push("/dashboard");
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Error al iniciar sesión');
+      setError(e instanceof Error ? e.message : "Error al iniciar sesión");
     } finally {
       setLoading(false);
     }
@@ -43,7 +50,9 @@ export function LoginForm() {
             </div>
             <span className="text-2xl font-bold text-white">FinanzasPro</span>
           </div>
-          <p className="text-slate-400 text-sm">Gestiona tus finanzas personales</p>
+          <p className="text-slate-400 text-sm">
+            Gestiona tus finanzas personales
+          </p>
         </div>
         <Card className="border-slate-700 bg-slate-800/50 backdrop-blur-sm shadow-2xl">
           <CardHeader className="pb-4">
@@ -81,9 +90,11 @@ export function LoginForm() {
                 <div className="relative">
                   <Input
                     id="password"
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     value={form.contrasena}
-                    onChange={(e) => setForm({ ...form, contrasena: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, contrasena: e.target.value })
+                    }
                     className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500 pr-10"
                     required
                   />
@@ -92,7 +103,11 @@ export function LoginForm() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -101,21 +116,18 @@ export function LoginForm() {
                 disabled={loading}
                 className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold h-10 mt-2"
               >
-                {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+                {loading ? "Iniciando sesión..." : "Iniciar sesión"}
               </Button>
               <p className="text-center text-slate-400 text-sm">
-                ¿No tienes cuenta?{' '}
-                <Link href="/register" className="text-emerald-400 hover:text-emerald-300 font-medium">
+                ¿No tienes cuenta?{" "}
+                <Link
+                  href="/register"
+                  className="text-emerald-400 hover:text-emerald-300 font-medium"
+                >
                   Regístrate
                 </Link>
               </p>
             </form>
-            <div className="mt-4 p-3 bg-slate-700/30 rounded-lg border border-slate-600/30">
-              <p className="text-xs text-slate-400 text-center">
-                Demo: <span className="text-slate-300">demo@finanzas.com</span> /{' '}
-                <span className="text-slate-300">Demo@1234</span>
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>

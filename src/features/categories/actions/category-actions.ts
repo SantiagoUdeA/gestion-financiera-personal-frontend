@@ -1,3 +1,5 @@
+'use server';
+
 import { CategoryRequest } from '@/types/category-api';
 import { categoryService } from '../services';
 
