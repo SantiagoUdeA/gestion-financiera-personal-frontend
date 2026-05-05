@@ -1,7 +1,6 @@
 export interface TransactionRequest {
   tipo: 'INGRESO' | 'GASTO';
   monto: number;
-  fecha: string;
   categoriaId: number;
 }
 

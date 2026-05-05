@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   ArrowLeftRight,
   Tag,
+  PiggyBank,
   LogOut,
   ChevronRight,
   X,
@@ -19,6 +20,7 @@ const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/transactions', label: 'Transacciones', icon: ArrowLeftRight },
   { href: '/categories', label: 'Categorías', icon: Tag },
+  { href: '/budgets', label: 'Presupuestos', icon: PiggyBank },
 ];
 
 interface SidebarProps {

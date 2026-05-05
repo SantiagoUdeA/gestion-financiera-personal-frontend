@@ -36,7 +36,7 @@ export class FakeTransactionService implements ITransactionService {
       id: nextId++,
       tipo: request.tipo,
       monto: request.monto,
-      fecha: request.fecha,
+      fecha: new Date().toISOString().split('T')[0],
       categoria: cat?.nombre ?? 'Sin categoría',
     };
     FAKE_TRANSACTIONS = [newTx, ...FAKE_TRANSACTIONS];
