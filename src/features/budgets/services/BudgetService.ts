@@ -28,7 +28,11 @@ export class BudgetService implements IBudgetService {
       headers: await this.getHeaders(),
       body: JSON.stringify(request),
     });
-    if (!res.ok) throw new Error('Error al crear presupuesto');
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      const msg = body?.mensaje ?? body?.message ?? 'Error al crear presupuesto';
+      throw new Error(msg);
+    }
     return res.json();
   }
 
@@ -38,7 +42,11 @@ export class BudgetService implements IBudgetService {
       headers: await this.getHeaders(),
       body: JSON.stringify(request),
     });
-    if (!res.ok) throw new Error('Error al actualizar presupuesto');
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      const msg = body?.mensaje ?? body?.message ?? 'Error al actualizar presupuesto';
+      throw new Error(msg);
+    }
     return res.json();
   }
 
@@ -47,7 +55,11 @@ export class BudgetService implements IBudgetService {
       method: 'DELETE',
       headers: await this.getHeaders(),
     });
-    if (!res.ok) throw new Error('Error al eliminar presupuesto');
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      const msg = body?.mensaje ?? body?.message ?? 'Error al eliminar presupuesto';
+      throw new Error(msg);
+    }
   }
 
   async comparativa(): Promise<BudgetComparisonResponse[]> {
