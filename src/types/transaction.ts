@@ -2,6 +2,7 @@ export interface TransactionRequest {
   tipo: 'INGRESO' | 'GASTO';
   monto: number;
   categoriaId: number;
+  fecha: string;
 }
 
 export interface TransactionResponse {

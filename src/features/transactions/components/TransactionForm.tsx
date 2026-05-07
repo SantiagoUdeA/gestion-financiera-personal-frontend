@@ -28,6 +28,7 @@ export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
     tipo: "GASTO",
     monto: 0,
     categoriaId: 0,
+    fecha: new Date().toISOString().split("T")[0],
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -63,6 +64,7 @@ export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
         tipo: "GASTO",
         monto: 0,
         categoriaId: first?.id ?? 0,
+        fecha: new Date().toISOString().split("T")[0],
       });
       setTimeout(() => setSuccess(false), 3000);
     } catch (e: unknown) {
@@ -115,6 +117,20 @@ export function TransactionForm({ onSubmit, creating }: TransactionFormProps) {
           onChange={(e) => setForm({ ...form, monto: Number.parseFloat(e.target.value) || 0 })}
           className="bg-slate-700/50 border-slate-600 text-white focus:border-emerald-500"
           placeholder="0"
+          required
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="fecha" className="text-slate-300 text-sm">
+          Fecha
+        </Label>
+        <Input
+          id="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={(e) => setForm({ ...form, fecha: e.target.value })}
+          className="bg-slate-700/50 border-slate-600 text-white focus:border-emerald-500"
           required
         />
       </div>
